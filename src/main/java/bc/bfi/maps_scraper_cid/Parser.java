@@ -1,26 +1,31 @@
 package bc.bfi.maps_scraper_cid;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import java.util.ArrayList;
 import java.util.List;
-import javax.json.*;
-import java.io.StringReader;
 
 class Parser {
 
     List<Place> parse(String json, String query) {
+        assert json != null : "json must not be null! Got: null";
+        assert query != null : "query must not be null! Got: null";
+
         List<Place> places = new ArrayList<>();
 
-        // Parse JSON
-        JsonObject jsonObject;
-        try (JsonReader jsonReader = Json.createReader(new StringReader(json))) {
-            jsonObject = jsonReader.readObject();
-        }
+        JsonObject jsonObject = parseJson(json);
+        JsonArray placesArray = readArray("places", jsonObject);
 
-        // Convert to a list of JSON objects
-        JsonArray placesArray = jsonObject.getJsonArray("places");
-        for (JsonValue value : placesArray) {
+        for (JsonElement element : placesArray) {
+            if (!element.isJsonObject()) {
+                continue;
+            }
+
+            JsonObject jsonPlace = element.getAsJsonObject();
             Place place = new Place();
-            JsonObject jsonPlace = value.asJsonObject();
 
             place.setName(readString("title", jsonPlace));
             place.setFullAddress(readString("address", jsonPlace));
@@ -42,28 +47,57 @@ class Parser {
         return places;
     }
 
-    private String readString(String key, JsonObject jsonPlace) {
-        String value = "";
-
-        try {
-            value = jsonPlace.getString(key);
-        } catch (Exception ignore) {
+    private JsonObject parseJson(String json) {
+        JsonElement parsed = JsonParser.parseString(json);
+        if (parsed.isJsonObject()) {
+            return parsed.getAsJsonObject();
         }
 
-        return value;
+        return new JsonObject();
+    }
+
+    private JsonArray readArray(String key, JsonObject jsonObject) {
+        if (jsonObject.has(key)) {
+            JsonElement element = jsonObject.get(key);
+            if (element.isJsonArray()) {
+                return element.getAsJsonArray();
+            }
+        }
+
+        return new JsonArray();
+    }
+
+    private String readString(String key, JsonObject jsonPlace) {
+        if (jsonPlace.has(key)) {
+            JsonElement element = jsonPlace.get(key);
+            if (element.isJsonPrimitive()) {
+                JsonPrimitive primitive = element.getAsJsonPrimitive();
+                if (primitive.isString()) {
+                    return primitive.getAsString();
+                }
+
+                return primitive.toString();
+            }
+        }
+
+        return "";
     }
 
     private String readNumber(String key, JsonObject jsonPlace) {
-        String value = "";
+        if (jsonPlace.has(key)) {
+            JsonElement element = jsonPlace.get(key);
+            if (element.isJsonPrimitive()) {
+                JsonPrimitive primitive = element.getAsJsonPrimitive();
+                if (primitive.isNumber()) {
+                    return primitive.getAsBigDecimal().toPlainString();
+                }
 
-        try {
-            value = jsonPlace
-                    .getJsonNumber(key)
-                    .bigDecimalValue()
-                    .toPlainString();
-        } catch (Exception ignore) {
+                if (primitive.isString()) {
+                    return primitive.getAsString();
+                }
+            }
         }
 
-        return value;
+        return "";
     }
 }
