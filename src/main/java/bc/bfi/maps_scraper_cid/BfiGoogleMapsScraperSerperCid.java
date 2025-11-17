@@ -1,16 +1,34 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- */
-
 package bc.bfi.maps_scraper_cid;
 
-/**
- *
- * @author bob
- */
+import java.util.ArrayList;
+import java.util.List;
+
 public class BfiGoogleMapsScraperSerperCid {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        Downloader downloader = new Downloader();
+        Parser parser = new Parser();
+        PlaceCsvWriter csvWriter = new PlaceCsvWriter();
+        List<Place> allPlaces = new ArrayList<>();
+
+        try {
+            Cids cids = new Cids("cids.txt");
+            List<String> cidValues = cids.getValues();
+            assert cidValues != null : "cidValues must not be null! Got: null";
+
+            for (String cid : cidValues) {
+                String response = downloader.download(cid);
+                if (response != null && !response.isEmpty()) {
+                    List<Place> places = parser.parse(response, cid);
+                    if (places != null) {
+                        allPlaces.addAll(places);
+                    }
+                }
+            }
+
+            csvWriter.write("places.csv", allPlaces);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 }
