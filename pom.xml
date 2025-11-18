@@ -9,7 +9,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
-        <exec.mainClass>bc.bfi.maps_scraper_cid.BfiGoogleMapsScraperSerperCid</exec.mainClass>
+        <exec.mainClass>bc.bfi.maps_scraper_cid.Main</exec.mainClass>
     </properties>
     
     <dependencies>

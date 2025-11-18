@@ -3,7 +3,7 @@ package bc.bfi.maps_scraper_cid;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BfiGoogleMapsScraperSerperCid {
+public class Main {
 
     public static void main(String[] args) {
         Downloader downloader = new Downloader();
