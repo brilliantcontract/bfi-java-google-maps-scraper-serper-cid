@@ -1,5 +1,6 @@
 package bc.bfi.maps_scraper_cid;
 
+import java.time.Duration;
 import java.util.Objects;
 import kong.unirest.HttpResponse;
 import kong.unirest.RequestBodyEntity;
@@ -25,7 +26,7 @@ public class Downloader {
         this.apiKey = apiKey;
         this.placesUrl = placesUrl;
 
-        this.unirest.config().connectTimeout(0);
+        Unirest.config().connectTimeout(10_000);
     }
 
     public String download(String cid) {

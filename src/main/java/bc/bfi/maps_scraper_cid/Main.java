@@ -10,13 +10,10 @@ public class Main {
         Parser parser = new Parser();
         PlaceCsvWriter csvWriter = new PlaceCsvWriter();
         List<Place> allPlaces = new ArrayList<>();
-
+        
         try {
             Cids cids = new Cids("cids.txt");
-            List<String> cidValues = cids.getValues();
-            assert cidValues != null : "cidValues must not be null! Got: null";
-
-            for (String cid : cidValues) {
+            for (String cid : cids.getValues()) {
                 String response = downloader.download(cid);
                 if (response != null && !response.isEmpty()) {
                     List<Place> places = parser.parse(response, cid);
