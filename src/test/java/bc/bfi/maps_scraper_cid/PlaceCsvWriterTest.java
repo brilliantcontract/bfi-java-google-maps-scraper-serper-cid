@@ -4,14 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class PlaceCsvWriterTest {
 
     @Test
-    void writeStoresHeaderAndRows() throws Exception {
+    void createAndAppendStoresHeaderAndRows() throws Exception {
         // Initialization.
         final Place place = new Place();
         place.setName("Test Name");
@@ -28,13 +27,13 @@ class PlaceCsvWriterTest {
         place.setGooglePlaceId("place-1");
         place.setWebsite("https://example.com");
         place.setPosition("1");
-        final List<Place> places = new ArrayList<>();
-        places.add(place);
-        final Path csvFile = Files.createTempFile("places", ".csv");
+        final Path directory = Files.createTempDirectory("places");
+        final Path csvFile = directory.resolve("places.csv");
         final PlaceCsvWriter writer = new PlaceCsvWriter();
 
         // Execution.
-        writer.write(csvFile.toString(), places);
+        writer.create(csvFile.toString());
+        writer.append(csvFile.toString(), place);
 
         // Assertion.
         List<String> lines = Files.readAllLines(csvFile);
@@ -42,5 +41,6 @@ class PlaceCsvWriterTest {
         assertThat(lines.get(0)).isEqualTo("Name,Full address,Latitude,Longitude,Permanently closed,Phone,Query,Rate,Rate counter,Type,CID,Google Place ID,Website,Position");
         assertThat(lines.get(1)).isEqualTo("Test Name,123 Main St,12.34,56.78,no,123-456-7890,cid-query,4.0,10,Store,cid-1,place-1,https://example.com,1");
         Files.deleteIfExists(csvFile);
+        Files.deleteIfExists(directory);
     }
 }
