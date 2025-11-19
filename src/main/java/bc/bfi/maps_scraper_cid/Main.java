@@ -12,10 +12,7 @@ public class Main {
         final String csvFilePath = "places.csv";
         File csvFile = new File(csvFilePath);
 
-        if (csvFile.exists()) {
-            System.err.println(csvFilePath + " already exists. Cannot proceed further.");
-            return;
-        }
+        verifyCsvFileIsNotExist(csvFile, csvFilePath);
 
         try {
             csvWriter.create(csvFilePath);
@@ -36,6 +33,13 @@ public class Main {
             }
         } catch (Exception exception) {
             exception.printStackTrace();
+        }
+    }
+
+    private static void verifyCsvFileIsNotExist(File csvFile, final String csvFilePath) {
+        if (csvFile.exists()) {
+            System.err.println(csvFilePath + " already exists. Cannot proceed further.");
+            System.exit(1);
         }
     }
 }
