@@ -14,6 +14,7 @@ public class Main {
         try {
             Cids cids = new Cids("cids.txt");
             for (String cid : cids.getValues()) {
+                System.out.println("Process CID - " + cid);
                 String response = downloader.download(cid);
                 if (response != null && !response.isEmpty()) {
                     List<Place> places = parser.parse(response, cid);
