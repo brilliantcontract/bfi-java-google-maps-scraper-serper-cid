@@ -9,6 +9,7 @@ public class Main {
         Downloader downloader = new Downloader();
         Parser parser = new Parser();
         PlaceCsvWriter csvWriter = new PlaceCsvWriter();
+        Storage storage = new Storage();
         final String csvFilePath = "places.csv";
         File csvFile = new File(csvFilePath);
 
@@ -16,12 +17,17 @@ public class Main {
 
         try {
             csvWriter.create(csvFilePath);
-            Cids cids = new Cids("cids.txt");
-            for (String cid : cids.getValues()) {
-                System.out.println("Process CID - " + cid);
-                String response = downloader.download(cid);
+            List<InvalidPlace> invalidPlaces = storage.readCsvFileWithInvalidPlaces();
+            for (InvalidPlace invalidPlace : invalidPlaces) {
+                if (invalidPlace == null) {
+                    continue;
+                }
+
+                String googlePlaceCode = invalidPlace.getGooglePlaceCode();
+                System.out.println("Process place - " + googlePlaceCode);
+                String response = downloader.download(invalidPlace);
                 if (response != null && !response.isEmpty()) {
-                    List<Place> places = parser.parse(response, cid);
+                    List<Place> places = parser.parse(response, invalidPlace.getLocation());
                     if (places != null) {
                         for (Place place : places) {
                             if (place != null) {
