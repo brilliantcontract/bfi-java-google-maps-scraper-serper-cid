@@ -1,6 +1,5 @@
 package bc.bfi.maps_scraper_cid;
 
-import java.time.Duration;
 import java.util.Objects;
 import kong.unirest.HttpResponse;
 import kong.unirest.RequestBodyEntity;
