@@ -2,6 +2,7 @@ package bc.bfi.maps_scraper_cid;
 
 import java.util.Objects;
 import kong.unirest.HttpResponse;
+import kong.unirest.HttpRequestWithBody;
 import kong.unirest.RequestBodyEntity;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestInstance;
@@ -35,6 +36,30 @@ public class Downloader {
                 .header("X-API-KEY", apiKey)
                 .header("Content-Type", "application/json")
                 .body("{\"cid\":\"" + cid + "\"}");
+
+        HttpResponse<String> response = request.asString();
+        assert response != null : "response must not be null! Got: null";
+
+        int status = response.getStatus();
+        assert status >= 200 && status < 300 : "Unexpected HTTP status! Got: " + status;
+
+        return response.getBody();
+    }
+
+    public String download(final InvalidPlace invalidPlace) {
+        Objects.requireNonNull(invalidPlace, "invalidPlace must not be null");
+
+        final String googlePlaceCode = invalidPlace.getGooglePlaceCode();
+        Objects.requireNonNull(googlePlaceCode, "googlePlaceCode must not be null");
+
+        final String language = invalidPlace.getLangugae();
+        Objects.requireNonNull(language, "language must not be null");
+
+        HttpRequestWithBody postRequest = unirest.post(placesUrl)
+                .header("X-API-KEY", apiKey)
+                .header("Content-Type", "application/json");
+        RequestBodyEntity request = postRequest.body("{\"hl\":\"" + language + "\",\"cid\":\""
+                + googlePlaceCode + "\"}");
 
         HttpResponse<String> response = request.asString();
         assert response != null : "response must not be null! Got: null";
